@@ -1,4 +1,23 @@
-(ns robots.core)
+(ns robots.core
+  "AdZerk Robots Interview Problem.
+
+  Overview:
+    - Parse a robot input file.
+    - Create a map to represent the environment.
+    - The environment contains the plateau bounds, and robots.
+    - Robots have an origin location, heading, actions and series.
+    - Based on the origin and actions we create a series.
+    - The series represents every location/state the robot will inhabit.
+
+  Why?
+    - The rationale for this design was to make time 'first class'.
+    - Each robot's series let's you deal with the robot 'in time' in a fairly
+      straight-forward way.
+    - Once you have a series you can detect collisions, plateau bounds, etc.
+    - It is also somewhat monadic.  Calculate series first, mess with data then
+      when you are ready 'commit' the future process and carry it out.
+    - This also lets you work with collections which I personally prefer.
+    ")
 
 (def test-input "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM")
 
@@ -127,7 +146,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Main
 
 (defn debug
-  "Put between fn in a -> to debug."
+  "Put between fns in a -> to debug."
   [x]
   (println x)
   x)
