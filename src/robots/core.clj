@@ -83,22 +83,25 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Environment
 
+(defn create-environment
+  "Given parsed input construct an environment map."
+  [[max-bounds & rest]]
+  {:max-plateau-bounds max-bounds
+   :robot-movements (partition 2 rest)})
+
 (defn seed-robots
+  "Given environment make robot representations & actions."
   [env]
   (let [robots (->> (:robot-movements env)
                     (map-indexed make-robot)
                     (map name-robot))]
     (-> env
-        (assoc :robot-origins robots)
+        (assoc  :robot-origins robots)
         (dissoc :robot-movements))))
 
-(defn create-environment [[max-bounds & rest]]
-  (println rest)
-  {:max-plateau-bounds max-bounds
-   :robot-movements (partition 2 rest)})
-
-
-(defn make-series [{x :x y :y h :heading :as r-o}]
+(defn make-series
+  "Determine each robots series based on origin and actions."
+  [{x :x y :y h :heading :as r-o}]
   (let [series-builder (fn [series action]
                          (let [prev   (last series)
                                update (do-action prev action)]
@@ -106,10 +109,16 @@
         init-series [[x y h]]]
     (assoc r-o :series (reduce series-builder init-series (:actions r-o)))))
 
-(defn create-movement-series [{r-o :robot-origins :as env}]
+(defn create-movement-series
+  "Robot actions are represented as a time series. A series is a list
+  of all the locations the robot will inhabit based on the actions
+  given to it."
+  [{r-o :robot-origins :as env}]
   (assoc env :robot-series (map make-series r-o)))
 
-(defn final-output [{r-s :robot-series :as env}]
+(defn final-output
+  "Final output is the last entry in the robot's series."
+  [{r-s :robot-series :as env}]
   (map #(last (:series %)) r-s))
 
 ;; summarize series
