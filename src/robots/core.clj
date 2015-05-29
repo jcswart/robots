@@ -118,6 +118,19 @@
         (assoc  :robot-origins robots)
         (dissoc :robot-movements))))
 
+(defn valid-location?
+  "Determine if a location is on the plateau."
+  [[x-bound y-bound] [x y h]]
+  (and (<= 0 x x-bound)
+       (<= 0 y y-bound)))
+
+(defn valid-series?
+  "Determine if all locations in a robot's series are valid."
+  [bounds series]
+  (->> series
+       (map #(valid-location? bounds %))
+       (every? true?)))
+
 (defn make-series
   "Determine each robots series based on origin and actions."
   [{x :x y :y h :heading :as r-o}]
@@ -157,3 +170,9 @@
       (seed-robots)
       (create-movement-series)
       (final-output)))
+
+;; TODO : Take filename & read it in -main
+;; TODO : Implement IO & CLI in boot
+;; TODO : (opt) warn on bounds
+;; TODO : (opt) warn on collision
+;; TODO : (opt) ascii map
