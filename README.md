@@ -1,28 +1,16 @@
-# Problem
+# Robots
 
-Make CLI app to:
+To see help and options:
 
-* taking input file name
-* simulate robot movement based on input contents
-* output final location & heading
+`boot robots -h`
 
-# Solution
+To run example:
 
-Minimum first solution is to:
+`boot robots -i test.robot`
 
-1. get input args
-2. read the file
-3. parse the file
-4. create time series of robot movements
-	* writing out all steps will make view/debugging easier later
-5. output final positions from time series as output
+To run example with warnings:
 
-## Optionals
+`boot robots -i test.robot -w`
 
-Once I get this done I would like to:
-
-1. Validate time series as legal moves before output
-2. Better visualize movement of robots
-3. Create a better DSL for input optimized for humans
 
 
