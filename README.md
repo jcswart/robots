@@ -10,7 +10,7 @@ To run example:
 
 To run example with warnings:
 
-`boot robots -i test.robot -w`
+`boot robots -i test-warn.robot -w`
 
 
 
