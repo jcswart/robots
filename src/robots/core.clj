@@ -19,8 +19,6 @@
     - This also lets you work with collections which I personally prefer.
     ")
 
-(def test-input "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Parsing
 
 (defn convert-char
@@ -48,9 +46,9 @@
 
 (defn parse-input
   "Turn a file of robot commands into clojure data."
-  []
+  [filename]
   (let [strings->char-seqs #(map seq %)]
-    (-> test-input
+    (-> (slurp filename)
         (clojure.string/split-lines)
         (strings->char-seqs)
         (remove-spaces)
@@ -61,7 +59,6 @@
 
 (def turn-left  {:N :W, :W :S, :S :E, :E :N})
 (def turn-right {:N :E, :E :S, :S :W, :W :N})
-
 
 (defn make-robot
   "A robot representation.
@@ -125,11 +122,18 @@
        (<= 0 y y-bound)))
 
 (defn valid-series?
-  "Determine if all locations in a robot's series are valid."
-  [bounds series]
-  (->> series
-       (map #(valid-location? bounds %))
-       (every? true?)))
+  "Determine if all locations in a robot's series are valid (on the plateau)."
+  [bounds robot]
+  ;; TODO : change series arg to robot, assoc result onto robot
+  (let [validated (->> (:series robot)
+                       (map (partial valid-location? bounds))
+                       (every? true?))]
+    (assoc robot :valid? validated)))
+
+(defn validate-robots
+  [env]
+  (->> (:robot-series env)
+       (map (partial valid-series? (:max-plateau-bounds env)))))
 
 (defn make-series
   "Determine each robots series based on origin and actions."
@@ -150,9 +154,10 @@
 
 (defn final-output
   "Final output is the last entry in the robot's series."
-  [{r-s :robot-series :as env}]
-  (map #(last (:series %)) r-s))
+  [world]
+  (map #(last (:series %)) world))
 
+;;
 ;; summarize series
 ;; (let [{s :series a :actions} (first (:robot-series res))] (interleave s a))
 
@@ -164,15 +169,14 @@
   (println x)
   x)
 
-(defn -main [& args]
-  (-> (parse-input)
-      (create-environment)
-      (seed-robots)
-      (create-movement-series)
-      (final-output)))
-
-;; TODO : Take filename & read it in -main
-;; TODO : Implement IO & CLI in boot
-;; TODO : (opt) warn on bounds
-;; TODO : (opt) warn on collision
-;; TODO : (opt) ascii map
+(defn -main
+  ":: filename -> result map"
+  [filename]
+  (let [world (-> (parse-input filename)
+                  (create-environment)
+                  (seed-robots)
+                  (create-movement-series)
+                  (validate-robots))
+        robot-positions (final-output world)]
+    {:output robot-positions
+     :world world}))
